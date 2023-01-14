@@ -23,7 +23,7 @@ public class UserController {
     @Resource
     private UserService service;
 
-    @PostMapping
+    @PostMapping("/loginOrRegister")
     public R loginOrRegistered(@RequestBody @Valid LoginOrRegisterForm form) {
         Map<String , Object> map = new HashMap<>();
         map.put("code",form.getCode());

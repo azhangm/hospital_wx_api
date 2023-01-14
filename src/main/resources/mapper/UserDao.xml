@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hospital.patient.wx.api.db.dao.UserDao">
+
+    <insert id="insert" parameterType="com.example.hospital.patient.wx.api.db.pojo.UserEntity">
+        UPSERT INTO HOSPITAL.PATIENT_USER (
+            "id","open_id","nickname","photo","sex","status","create_time"
+        )
+        VALUES(
+            NEXT VALUE FOR HOSPITAL.PATIENT_USER_SEQUENCE,#{openId},#{nickname},#{photo},#{sex},#{status},NOw()
+        );
+
+
+    </insert>
+    <select id="searchAlreadyRegistered" resultType="java.lang.Integer">
+        SELECT "id" FROM  HOSPITAL.PATIENT_UESR
+        WHERE "open_id" = #{openId}
+        LIMIT 1;
+    </select>
+</mapper>

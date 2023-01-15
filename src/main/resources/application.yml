@@ -80,7 +80,7 @@ wechat:
       patient-wx-api:
         app-id: wx4cb8e9621950da45
         app-v3-secret: 6c6085b7a939450d833d8bb3081d4628
-          mch-id: 1526972031
+        mch-id: 1526972031
         domain: http://内网穿透的外网IP地址和端口/patient-wx-api
         cert-path: apiclient_cert.p12
 

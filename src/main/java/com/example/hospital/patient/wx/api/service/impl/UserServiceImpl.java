@@ -9,13 +9,13 @@ import com.example.hospital.patient.wx.api.db.dao.UserInfoCardDao;
 import com.example.hospital.patient.wx.api.db.pojo.UserEntity;
 import com.example.hospital.patient.wx.api.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.xml.crypto.Data;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 public class UserServiceImpl implements UserService {
     @Value("${wechat.app-id}")
     String appId;

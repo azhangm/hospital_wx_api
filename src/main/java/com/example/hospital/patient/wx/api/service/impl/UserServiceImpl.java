@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
         String code = MapUtil.getStr(param, "code");
         // 由临时授权码获得 open_id
         String openId = getOpenId(code);
-
+        System.out.println(openId);
         Integer id = userDao.searchAlreadyRegistered(openId);
         if (id != null) map.put("successMessage","登录成功");
         else {
@@ -65,10 +65,16 @@ public class UserServiceImpl implements UserService {
         map.put("appid",appId);
         map.put("secret",appSecret);
         map.put("js_code",code);
+
+
+        System.out.println("appid : " + appId);
+        System.out.println("appSecret : " + appSecret);
+        System.out.println("code : " + code);
         map.put("grant_type","authorization_code");
         String response = HttpUtil.get(url,map);
         JSONObject json = JSONUtil.parseObj(response);
         String  openid = json.getStr("openid");
+        System.out.println(openid);
         if(openid == null || openid.length() == 0) throw new RuntimeException("临时登录凭证错误");
         return openid;
     }

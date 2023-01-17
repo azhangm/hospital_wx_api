@@ -74,7 +74,7 @@ sa-token:
 
 wechat:
   app-id: wx865e4cf559d81fe5
-  app-secret: cc34ca93e9...2c8
+  app-secret: bcbd55d26322260f2a99d272d670c8d1
   pay:
     v3:
       patient-wx-api:

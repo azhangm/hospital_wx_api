@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 @Mapper
 public interface UserDao {
-
+    @Transactional
     void insert(UserEntity param);
 
     Integer searchAlreadyRegistered(String openId);

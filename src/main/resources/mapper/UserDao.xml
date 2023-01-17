@@ -8,13 +8,13 @@
         )
         VALUES(
             NEXT VALUE FOR HOSPITAL.PATIENT_USER_SEQUENCE,#{openId},#{nickname},#{photo},#{sex},#{status},NOw()
-        );
+        )
 
 
     </insert>
     <select id="searchAlreadyRegistered" resultType="java.lang.Integer">
-        SELECT "id" FROM  HOSPITAL.PATIENT_UESR
+        SELECT "id" FROM  HOSPITAL.PATIENT_USER
         WHERE "open_id" = #{openId}
-        LIMIT 1;
+        LIMIT 1
     </select>
 </mapper>

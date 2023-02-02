@@ -1,15 +1,13 @@
 package com.example.hospital.patient.wx.api.controller;
 
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.map.MapUtil;
 import com.example.hospital.patient.wx.api.common.R;
 import com.example.hospital.patient.wx.api.controller.form.LoginOrRegisterForm;
 import com.example.hospital.patient.wx.api.service.UserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -37,5 +35,14 @@ public class UserController {
         StpUtil.login(id);
         String tokenValue = StpUtil.getTokenValue();
         return R.ok(successMessage).put("token",tokenValue);
+    }
+
+
+    @GetMapping("/searchUserInfo")
+    @SaCheckLogin
+    public R searchUserInfo() {
+        int userId = StpUtil.getLoginIdAsInt();
+        Map<String,Object> map =  service.searchUserInfo(userId);
+        return R.ok().put("result",map);
     }
 }

@@ -65,6 +65,14 @@ public class UserServiceImpl implements UserService {
         userInfoCardDao.insert(param);
     }
 
+    @Override
+    public Map<String, Object> searchUserInfo(Integer userId) {
+        Map<String, Object> map = userDao.searchUserInfo(userId);
+        String tel = userInfoCardDao.searchUserTel(userId);
+        map.put("tel",tel);
+        return map;
+    }
+
     private String getOpenId(String code) {
         String url = "https://api.weixin.qq.com/sns/jscode2session";
         Map<String,Object> map = new HashMap<>();

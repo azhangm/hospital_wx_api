@@ -11,4 +11,6 @@ public interface UserService {
     Map<String,Object> loginOrRegistered(Map<String,Object> param);
 
     void insertUserInfoCard(UserInfoCardEntity param);
+
+    Map<String, Object> searchUserInfo(Integer userId);
 }

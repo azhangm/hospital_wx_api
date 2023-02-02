@@ -17,4 +17,12 @@
         WHERE "open_id" = #{openId}
         LIMIT 1
     </select>
+
+    <select id="searchUserInfo" resultType="java.util.Map" parameterType="int">
+        SELECT "nickname","sex","photo"
+        FROM HOSPITAL.PATIENT_USER
+        WHERE "id" = ${userId}
+    </select>
+
+
 </mapper>

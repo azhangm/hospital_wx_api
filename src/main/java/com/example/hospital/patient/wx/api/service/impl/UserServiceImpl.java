@@ -7,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import com.example.hospital.patient.wx.api.db.dao.UserDao;
 import com.example.hospital.patient.wx.api.db.dao.UserInfoCardDao;
 import com.example.hospital.patient.wx.api.db.pojo.UserEntity;
+import com.example.hospital.patient.wx.api.db.pojo.UserInfoCardEntity;
 import com.example.hospital.patient.wx.api.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,11 @@ public class UserServiceImpl implements UserService {
         map.put("tel",phone);
         map.put("id",id);
         return map;
+    }
+
+    @Override
+    public void insertUserInfoCard(UserInfoCardEntity param) {
+        userInfoCardDao.insert(param);
     }
 
     private String getOpenId(String code) {

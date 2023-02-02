@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.hospital.patient.wx.api.db.dao.UserInfoCardDao">
+    <insert id="insert" parameterType="com.example.hospital.patient.wx.api.db.pojo.UserInfoCardEntity">
+        UPSERT INTO HOSPITAL.PATIENT_USER_INFO_CARD(
+        "id",
+        "user_id", "uuid", "name", "sex", "pid",
+        "tel", "birthday", "medical_history", "insurance_type"
+    )
+    VALUES (
+        NEXT VALUE FOR HOSPITAL.PATIENT_USER_INFO_CARD_SEQUENCE,
+        ${userId}, #{uuid}, #{name}, #{sex}, #{pid},
+        #{tel}, #{birthday}, #{medicalHistory}, #{insuranceType}
+        )
+    </insert>
 
     <select id="searchUserTel" resultType="java.lang.String">
         SELECT "tel"

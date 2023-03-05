@@ -6,6 +6,6 @@
 
     <select id="selectAllMedicalDept" resultType="java.util.Map">
         SELECT "id" , "name"
-        FROM HOSPITAL.MEDICAL_DEPT;
+        FROM HOSPITAL.MEDICAL_DEPT
     </select>
 </mapper>

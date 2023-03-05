@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface MedicalDeptSubDao {
 
-    List<Map<Integer,String>> selectAllSubMedicalDeptSub(Integer medicalId);
+    List<Map<Integer,String>> selectAllSubMedicalDeptSub(Integer deptId);
 
 }
 

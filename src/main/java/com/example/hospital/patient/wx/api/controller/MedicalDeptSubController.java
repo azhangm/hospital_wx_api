@@ -21,8 +21,8 @@ public class MedicalDeptSubController {
     private MedicalDeptSubService medicalDeptSubService;
 
     @PostMapping("/searchMedicalDeptSubList")
-    @SaCheckLogin
     public R searchMedicalDeptSubList(@RequestBody @Valid SearchMedicalDeptSubListForm form) {
+        System.out.println(form.getDeptId());
         List<Map<Integer, String>> li = medicalDeptSubService.selectAllMedicalSub(form.getDeptId());
         return R.ok().put("result", li);
     }

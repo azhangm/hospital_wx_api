@@ -9,7 +9,6 @@ import cn.hutool.json.JSONUtil;
 import com.example.hospital.patient.wx.api.common.R;
 import com.example.hospital.patient.wx.api.controller.form.InsertPatientUserInfoForm;
 import com.example.hospital.patient.wx.api.controller.form.UpdateUserInfoCardForm;
-import com.example.hospital.patient.wx.api.db.dao.UserInfoCardDao;
 import com.example.hospital.patient.wx.api.db.pojo.UserInfoCardEntity;
 import com.example.hospital.patient.wx.api.service.UserInfoCardService;
 import com.example.hospital.patient.wx.api.service.UserService;
@@ -22,7 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user/card/info")
 public class UserInfoCardController {
-
+///user/card/info/hasUserInfoCard
     @Resource
     private UserService userService;
 
@@ -60,6 +59,15 @@ public class UserInfoCardController {
             entity.setMedicalHistory(json);
             userInfoCardService.update(entity);
             return R.ok();
+        }
+
+
+        @GetMapping("/hasUserInfoCard")
+        @SaCheckLogin
+        public R hasUserInfo() {
+            int userId = StpUtil.getLoginIdAsInt();
+            Boolean info = userInfoCardService.hasUserInfo(userId);
+            return R.ok().put("result",info);
         }
 
 }

@@ -34,4 +34,10 @@ public class UserInfoCardServiceImpl implements UserInfoCardService {
     public void update(UserInfoCardEntity entity) {
         userInfoCardDao.update(entity);
     }
+
+    @Override
+    public Boolean hasUserInfo(Integer userId) {
+        Integer id = userInfoCardDao.hasUserInfoCard(userId);
+        return id != null;
+    }
 }

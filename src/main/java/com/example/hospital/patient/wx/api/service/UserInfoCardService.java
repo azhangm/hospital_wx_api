@@ -9,4 +9,6 @@ public interface UserInfoCardService {
     Map<String,Object> searchUserInfoCard(Integer userId);
 
     void update(UserInfoCardEntity entity);
+
+    Boolean hasUserInfo(Integer userId);
 }

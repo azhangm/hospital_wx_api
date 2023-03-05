@@ -73,6 +73,8 @@ public class UserServiceImpl implements UserService {
         return map;
     }
 
+
+
     private String getOpenId(String code) {
         String url = "https://api.weixin.qq.com/sns/jscode2session";
         Map<String,Object> map = new HashMap<>();

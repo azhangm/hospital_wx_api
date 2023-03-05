@@ -14,4 +14,6 @@ public interface UserInfoCardDao {
     Map<String,Object> searchUserInfoCard(Integer userId);
 
     void update(UserInfoCardEntity entity);
+
+    Integer hasUserInfoCard(int userId);
 }

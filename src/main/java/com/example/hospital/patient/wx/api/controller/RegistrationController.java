@@ -1,8 +1,10 @@
 package com.example.hospital.patient.wx.api.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import com.example.hospital.patient.wx.api.common.R;
+import com.example.hospital.patient.wx.api.controller.form.CheckRegisterConditionForm;
 import com.example.hospital.patient.wx.api.controller.form.SearchCanRegisterInDateRangeForm;
 import com.example.hospital.patient.wx.api.controller.form.SearchDeptSubDoctorPlanInDayForm;
 import com.example.hospital.patient.wx.api.service.RegistrationService;
@@ -31,10 +33,20 @@ public class RegistrationController {
     }
 
     @PostMapping("/searchDeptSubDoctorPlanInDay")
-    @SaCheckLogin
     public R searchDeptSubDoctorPlanInDay(@RequestBody @Valid SearchDeptSubDoctorPlanInDayForm form) {
-        Map<String,Object> param = BeanUtil.beanToMap(form);
+        Map<String, Object> param = BeanUtil.beanToMap(form);
         List<Map<String, Object>> maps = registrationService.searchDeptSubDoctorPlanInDay(param);
         return R.ok().put("result", maps);
     }
+
+    @PostMapping("/checkRegisterCondition")
+    @SaCheckLogin
+    public R checkRegisterCondition(@RequestBody @Valid CheckRegisterConditionForm form) {
+        int userId = StpUtil.getLoginIdAsInt();
+        form.setUserId(userId);
+        Map<String,Object> param = BeanUtil.beanToMap(form);
+        String result = registrationService.checkRegisterCondition(param);
+        return R.ok().put("result", result);
+    }
+
 }

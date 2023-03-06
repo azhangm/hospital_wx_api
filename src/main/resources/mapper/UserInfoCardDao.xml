@@ -44,4 +44,10 @@
         )
     </update>
 
+    <select id="searchExistFaceModel" parameterType="int" resultType="Boolean">
+        SELECT "exist_face_model" AS "existFaceModel"
+        FROM HOSPITAL.PATIENT_USER_INFO_CARD
+        WHERE "user_id" = ${userId}
+        LIMIT 1
+    </select>
 </mapper>

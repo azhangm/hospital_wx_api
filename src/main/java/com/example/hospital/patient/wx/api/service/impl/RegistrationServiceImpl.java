@@ -6,6 +6,9 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import com.example.hospital.patient.wx.api.db.dao.DoctorWorkPlanDao;
+import com.example.hospital.patient.wx.api.db.dao.MedicalRegistrationDao;
+import com.example.hospital.patient.wx.api.db.dao.UserInfoCardDao;
+import com.example.hospital.patient.wx.api.service.FaceAuthService;
 import com.example.hospital.patient.wx.api.service.RegistrationService;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,16 @@ import java.util.Map;
 public class RegistrationServiceImpl implements RegistrationService {
     @Resource
     private DoctorWorkPlanDao doctorWorkPlanDao;
+
+    @Resource
+    private MedicalRegistrationDao medicalRegistrationDao;
+
+    @Resource
+    private UserInfoCardDao userInfoCardDao;
+
+    @Resource
+    private FaceAuthService faceAuthService;
+
 
     @Override
     public List<Map<String, Object>> searchCanRegisterInDateRange(Map<String,Object> param) {
@@ -49,5 +62,36 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public List<Map<String,Object>> searchDeptSubDoctorPlanInDay(Map<String,Object> param) {
         return doctorWorkPlanDao.searchDeptSubDoctorPlanInDay(param);
+    }
+
+    
+    @Override
+    public String checkRegisterCondition(Map<String,Object> param) {
+        //检查当天用户是否已经挂号3次以上
+        param.put("today", DateUtil.today());
+        long count = medicalRegistrationDao.searchRegistrationCountInToday(param);
+        if (count == 3) {
+            return "已经达到当天挂号上限";
+        }
+
+        //检查当天是否已经挂过该门诊的号
+        Integer id = medicalRegistrationDao.hasRegisterRecordInDay(param);
+        if (id != null) {
+            return "已经挂过该诊室的号";
+        }
+
+        //检查是否存在人脸面部数据
+        int userId = MapUtil.getInt(param, "userId");
+        Boolean flag = userInfoCardDao.searchExistFaceModel(userId);
+        if (null == flag || !flag) {
+            return "不存在面部模型";
+        }
+
+        //检查今日是否存在挂号用户的面部识别记录
+        flag = faceAuthService.hasFaceAuthInDay(param);
+        if (!flag) {
+            return "当日没有人脸验证记录";
+        }
+        return "满足挂号条件";
     }
 }

@@ -5,5 +5,8 @@ import java.util.Map;
 
 public interface RegistrationService {
      List<Map<String, Object>> searchCanRegisterInDateRange(Map<String,Object> param);
+
     List<Map<String,Object>> searchDeptSubDoctorPlanInDay(Map<String,Object> param);
+
+    String checkRegisterCondition(Map<String,Object> param);
 }

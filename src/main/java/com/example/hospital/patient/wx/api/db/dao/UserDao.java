@@ -13,4 +13,5 @@ public interface UserDao {
     Integer searchAlreadyRegistered(String openId);
 
     Map<String ,Object> searchUserInfo(Integer userId);
+
 }

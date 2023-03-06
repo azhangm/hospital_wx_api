@@ -24,5 +24,4 @@
         WHERE "id" = ${userId}
     </select>
 
-
 </mapper>

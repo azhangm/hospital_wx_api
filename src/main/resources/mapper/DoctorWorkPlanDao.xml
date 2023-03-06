@@ -3,5 +3,27 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.hospital.patient.wx.api.db.dao.DoctorWorkPlanDao">
-    
+    <select id="searchCanRegisterInDateRange" parameterType="Map" resultType="String">
+        SELECT DISTINCT "date"
+        FROM HOSPITAL.DOCTOR_WORK_PLAN
+        WHERE "dept_sub_id" = ${deptSubId}
+          AND "date" BETWEEN TO_DATE('${startDate}') AND TO_DATE('${endDate}')
+    </select>
+
+    <select id="searchDeptSubDoctorPlanInDay" parameterType="Map" resultType="HashMap">
+        SELECT d."id"          AS "id",
+               d."name"        AS "name",
+               d."photo"       AS "photo",
+               d."job"         AS "job",
+               d."description" AS "description",
+               p."num"         AS "num",
+               p."maximum"     AS "maximum",
+               TO_CHAR(dp."price_1", '#00.00') AS "price"
+        FROM HOSPITAL.DOCTOR_WORK_PLAN p
+                 JOIN HOSPITAL.DOCTOR d ON p."doctor_id" = d."id"
+                 JOIN HOSPITAL.DOCTOR_PRICE dp ON p."doctor_id" = dp."doctor_id"
+        WHERE p."dept_sub_id" = ${deptSubId}
+          AND p."date" = TO_DATE('${date}')
+    </select>
+
 </mapper>

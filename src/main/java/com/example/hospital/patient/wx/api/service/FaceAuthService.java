@@ -4,4 +4,7 @@ import java.util.Map;
 
 public interface FaceAuthService {
     Boolean hasFaceAuthInDay(Map<String, Object> param);
+
+    void createFaceMode(Map<String, Object> map);
+
 }

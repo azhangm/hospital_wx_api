@@ -86,11 +86,11 @@ wechat:
 
 tencent:
   cloud:
-    appId: 132123123
-    secretId: sadasd
-    secretKey: asdasd
-    face:
-      groupName: hospital
+    appId: 1317189198
+    secretId: AKIDfFzZ3OYTBj6B2jEXdXGl3GTXO1VqPmwv
+    secretKey: oZ4S1UluteIl12rX3KLAn58zjIchdNt9
+    zmface:
+      groupName: A_ZHANG
       region: ap-beijing
   trtc:
     appId: 23131

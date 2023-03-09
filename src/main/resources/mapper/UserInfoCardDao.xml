@@ -43,6 +43,12 @@
         #{tel}, #{birthday}, #{medicalHistory}, #{insuranceType}
         )
     </update>
+    <update id="updateExistFaceModel">
+        UPSERT INTO HOSPITAL.PATIENT_USER_INFO_CARD( "id", "exist_face_model" )
+        SELECT "id", ${existFaceModel}
+        FROM HOSPITAL.PATIENT_USER_INFO_CARD
+        WHERE "user_id" = ${userId}
+    </update>
 
     <select id="searchExistFaceModel" parameterType="int" resultType="Boolean">
         SELECT "exist_face_model" AS "existFaceModel"

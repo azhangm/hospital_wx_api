@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "tencent.cloud.secretKey",
+      "type": "java.lang.String",
+      "description": "Description for tencent.cloud.secretKey."
+  }
+] }

@@ -5,6 +5,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import com.example.hospital.patient.wx.api.common.R;
 import com.example.hospital.patient.wx.api.controller.form.CreateFaceModelForm;
+import com.example.hospital.patient.wx.api.controller.form.VerifyFaceModelForm;
 import com.example.hospital.patient.wx.api.service.FaceAuthService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,5 +30,12 @@ public class FaceAuthController {
         Map<String,Object> param = BeanUtil.beanToMap(form);
         faceAuthService.createFaceMode(param);
         return R.ok();
+    }
+
+    @PostMapping("/verifyFaceModel")
+    @SaCheckLogin
+    public R verifyFaceModel(@RequestBody @Valid VerifyFaceModelForm form) {
+        int userId = StpUtil.getLoginIdAsInt();
+        return R.ok().put("result", faceAuthService.verifyFaceModel(userId, form.getPhoto()));
     }
 }

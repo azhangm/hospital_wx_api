@@ -1,5 +1,7 @@
 package com.example.hospital.patient.wx.api.service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Map;
 
 public interface FaceAuthService {
@@ -7,4 +9,6 @@ public interface FaceAuthService {
 
     void createFaceMode(Map<String, Object> map);
 
+    @Transactional
+    boolean verifyFaceModel(int userId, String photo);
 }

@@ -90,7 +90,7 @@ tencent:
     secretId: AKIDfFzZ3OYTBj6B2jEXdXGl3GTXO1VqPmwv
     secretKey: oZ4S1UluteIl12rX3KLAn58zjIchdNt9
     zmface:
-      groupName: A_ZHANG
+      groupName: LP0504
       region: ap-beijing
   trtc:
     appId: 23131

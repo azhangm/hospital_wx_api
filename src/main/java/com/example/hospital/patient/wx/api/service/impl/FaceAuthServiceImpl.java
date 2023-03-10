@@ -1,18 +1,21 @@
 package com.example.hospital.patient.wx.api.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.alipay.service.schema.util.StringUtil;
 import com.example.hospital.patient.wx.api.db.dao.FaceAuthDao;
 import com.example.hospital.patient.wx.api.db.dao.UserInfoCardDao;
+import com.example.hospital.patient.wx.api.db.pojo.FaceAuthEntity;
 import com.example.hospital.patient.wx.api.exception.HospitalException;
 import com.example.hospital.patient.wx.api.service.FaceAuthService;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
-import com.tencentcloudapi.iai.v20200303.IaiClient;
-import com.tencentcloudapi.iai.v20200303.models.CreatePersonRequest;
-import com.tencentcloudapi.iai.v20200303.models.CreatePersonResponse;
+import com.tencentcloudapi.iai.v20180301.IaiClient;
+import com.tencentcloudapi.iai.v20180301.models.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -50,7 +53,7 @@ public class FaceAuthServiceImpl implements FaceAuthService {
      * @param map 地图
      */
     @Override
-    public void createFaceMode(Map<String,Object> map) {
+    public void createFaceMode(Map<String, Object> map) {
         Integer userId = (Integer) map.get("userId");
         String photo = (String) map.get("photo");
         // 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
@@ -71,7 +74,7 @@ public class FaceAuthServiceImpl implements FaceAuthService {
         long gender = sex.equals("男") ? 1L : 2L;
         req.setPersonName(name);
 //        看 api 写代码 写死即可
-        req.set("image",photo);
+        req.set("Image",photo);
         req.set("UniquePersonControl",4);
         req.set("QualityControl",4);
         req.set("NeedRotateDetection",1);
@@ -91,7 +94,44 @@ public class FaceAuthServiceImpl implements FaceAuthService {
 //            全局异常处理。
             throw new HospitalException(e);
         }
+    }
 
+    @Override
+    @Transactional
+    public boolean verifyFaceModel(int userId, String photo) {
+        try {
+            Credential cred = new Credential(secretId, secretKey);
+            IaiClient client = new IaiClient(cred, region);
+            //执行人脸识别
+            VerifyPersonRequest verifyPersonRequest = new VerifyPersonRequest();
+            verifyPersonRequest.setPersonId(userId + "");
+            verifyPersonRequest.setImage(photo);
+            verifyPersonRequest.setQualityControl(4L);
+            VerifyPersonResponse verifyPersonResponse = client.VerifyPerson(verifyPersonRequest);
+            boolean face = verifyPersonResponse.getIsMatch();
+            if (!face) {
+                return false;
+            }
+            //利用腾讯云执行静态活体检测
+            DetectLiveFaceRequest detectLiveFaceRequest = new DetectLiveFaceRequest();
+            detectLiveFaceRequest.setImage(photo);
+            DetectLiveFaceResponse detectLiveFaceResponse = client.DetectLiveFace(detectLiveFaceRequest);
+            boolean living = detectLiveFaceResponse.getIsLiveness();
+            //合并人脸识别和活体识别的结果
 
+            //如果身份验证通过，就写入数据库
+            if (living) {
+                Integer cardId = userInfoCardDao.searchIdByUserId(userId);
+                FaceAuthEntity entity = new FaceAuthEntity();
+                entity.setPatientCardId(cardId);
+                entity.setDate(DateUtil.today());
+                faceAuthDao.insert(entity);
+            }
+            return living;
+        }
+        catch (TencentCloudSDKException e) {
+            log.error("人脸验证失败", e);
+            return false;
+        }
     }
 }

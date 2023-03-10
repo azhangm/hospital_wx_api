@@ -3,6 +3,15 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.hospital.patient.wx.api.db.dao.FaceAuthDao">
+    <insert id="insert" parameterType="com.example.hospital.patient.wx.api.db.pojo.FaceAuthEntity">
+        UPSERT INTO HOSPITAL.PATIENT_FACE_AUTH(
+        "id", "patient_card_id", "date"
+    )
+    VALUES(
+        NEXT VALUE FOR HOSPITAL.PATIENT_FACE_AUTH_SEQUENCE, ${patientCardId} , TO_DATE('${date}')
+        )
+    </insert>
+
     <select id="hasFaceAuthInDay" parameterType="Map" resultType="Integer">
         SELECT a."id" AS "id"
         FROM HOSPITAL.PATIENT_FACE_AUTH a

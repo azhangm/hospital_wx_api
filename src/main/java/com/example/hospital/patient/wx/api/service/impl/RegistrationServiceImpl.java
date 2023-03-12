@@ -10,6 +10,7 @@ import com.example.hospital.patient.wx.api.db.dao.MedicalRegistrationDao;
 import com.example.hospital.patient.wx.api.db.dao.UserInfoCardDao;
 import com.example.hospital.patient.wx.api.service.FaceAuthService;
 import com.example.hospital.patient.wx.api.service.RegistrationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class RegistrationServiceImpl implements RegistrationService {
     @Resource
     private DoctorWorkPlanDao doctorWorkPlanDao;
@@ -81,14 +83,16 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         //检查是否存在人脸面部数据
-        int userId = MapUtil.getInt(param, "userId");
-        Boolean flag = userInfoCardDao.searchExistFaceModel(userId);
-        if (null == flag || !flag) {
-            return "不存在面部模型";
-        }
+//        int userId = MapUtil.getInt(param, "userId");
+
+//        Boolean existFaceModel = userInfoCardDao.searchExistFaceModel(userId);
+//        log.error("Boolean  ----- " , existFaceModel);
+//        if (null == existFaceModel || !existFaceModel) {
+//            return "不存在面部模型";
+//        }
 
         //检查今日是否存在挂号用户的面部识别记录
-        flag = faceAuthService.hasFaceAuthInDay(param);
+        Boolean flag = faceAuthService.hasFaceAuthInDay(param);
         if (!flag) {
             return "当日没有人脸验证记录";
         }

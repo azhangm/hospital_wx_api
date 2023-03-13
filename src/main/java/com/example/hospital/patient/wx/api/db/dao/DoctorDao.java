@@ -1,10 +1,12 @@
 package com.example.hospital.patient.wx.api.db.dao;
 
 
-import com.example.hospital.patient.wx.api.db.pojo.UserEntity;
+
+import java.util.Map;
 
 
 public interface DoctorDao {
+         Map<String,Object> searchDoctorInfoById(int id);
 }
 
 

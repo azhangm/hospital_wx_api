@@ -26,4 +26,12 @@
           AND p."date" = TO_DATE('${date}')
     </select>
 
+    <update id="updateNumById" parameterType="Map">
+        UPSERT INTO HOSPITAL.DOCTOR_WORK_PLAN("id","num")
+        SELECT "id",
+               "num" + ${n} AS "num"
+        FROM HOSPITAL.DOCTOR_WORK_PLAN
+        WHERE "id" = ${id}
+    </update>
+
 </mapper>

@@ -7,6 +7,9 @@ public interface DoctorWorkPlanScheduleDao {
 
      List<Map<String,Object>> searchDoctorWorkPlanSchedule(Map param);
 
+
+     int updateNumById(Map<String,Object> param);
+
 }
 
 

@@ -14,4 +14,6 @@ public interface UserDao {
 
     Map<String ,Object> searchUserInfo(Integer userId);
 
+    Map<String,Object> searchOpenId(int userId);
+
 }

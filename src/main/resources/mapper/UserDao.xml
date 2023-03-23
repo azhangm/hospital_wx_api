@@ -24,4 +24,12 @@
         WHERE "id" = ${userId}
     </select>
 
+    <select id="searchOpenId" parameterType="int" resultType="HashMap">
+        SELECT u."open_id" AS "openId",
+               c."id" AS "patientCardId"
+        FROM HOSPITAL.PATIENT_USER u
+                 JOIN HOSPITAL.PATIENT_USER_INFO_CARD c ON c."user_id"=u."id"
+        WHERE u."id" = #{userId}
+    </select>
+
 </mapper>

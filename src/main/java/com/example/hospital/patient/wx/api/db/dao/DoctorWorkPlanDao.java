@@ -11,6 +11,8 @@ public interface DoctorWorkPlanDao {
 
 
     List<Map<String,Object>> searchDeptSubDoctorPlanInDay(Map<String,Object> param);
+
+    int updateNumById(Map<String,Object> param);
 }
 
 

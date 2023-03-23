@@ -79,6 +79,7 @@ wechat:
     v3:
       patient-wx-api:
         app-id: wx4cb8e9621950da45
+        app-secret: 9d80f4125c50e1cf8bc6031c9319b2df
         app-v3-secret: 6c6085b7a939450d833d8bb3081d4628
         mch-id: 1526972031
         domain: http://内网穿透的外网IP地址和端口/patient-wx-api

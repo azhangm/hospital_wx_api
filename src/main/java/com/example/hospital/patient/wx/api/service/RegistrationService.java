@@ -11,4 +11,6 @@ public interface RegistrationService {
     String checkRegisterCondition(Map<String,Object> param);
 
     List<Map<String,Object>> searchDoctorWorkPlanSchedule(Map<String,Object> param);
+
+    Map<String,Object> registerMedicalAppointment(Map<String,Object> param);
 }

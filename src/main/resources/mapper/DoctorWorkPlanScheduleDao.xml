@@ -17,4 +17,13 @@
         ORDER BY s."id"
     </select>
 
+    <update id="updateNumById" parameterType="Map">
+        UPSERT INTO HOSPITAL.DOCTOR_WORK_PLAN_SCHEDULE("id","num")
+        SELECT "id",
+               "num" + ${n} AS "num"
+        FROM HOSPITAL.DOCTOR_WORK_PLAN_SCHEDULE
+        WHERE "id" = ${id}
+    </update>
+
+
 </mapper>

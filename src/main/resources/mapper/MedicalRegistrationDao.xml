@@ -23,4 +23,18 @@
         LIMIT 1
     </select>
 
+    <insert id="insert" parameterType="com.example.hospital.patient.wx.api.db.pojo.MedicalRegistrationEntity">
+        UPSERT INTO HOSPITAL.MEDICAL_REGISTRATION(
+        "id", "patient_card_id", "work_plan_id", "doctor_schedule_id",
+        "doctor_id", "dept_sub_id", "date", "slot", "amount",
+         "out_trade_no", "prepay_id", "payment_status", "create_time"
+    )
+    VALUES(
+        NEXT VALUE FOR HOSPITAL.MEDICAL_REGISTRATION_SEQUENCE, ${patientCardId}, ${workPlanId}, ${doctorScheduleId},
+        ${doctorId}, ${deptSubId}, TO_DATE('${date}'), ${slot}, ${amount},
+        #{outTradeNo}, #{prepayId}, 1, NOW()
+        )
+    </insert>
+
+
 </mapper>

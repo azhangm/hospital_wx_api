@@ -4,10 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import com.example.hospital.patient.wx.api.common.R;
-import com.example.hospital.patient.wx.api.controller.form.CheckRegisterConditionForm;
-import com.example.hospital.patient.wx.api.controller.form.SearchCanRegisterInDateRangeForm;
-import com.example.hospital.patient.wx.api.controller.form.SearchDeptSubDoctorPlanInDayForm;
-import com.example.hospital.patient.wx.api.controller.form.SearchDoctorWorkPlanScheduleForm;
+import com.example.hospital.patient.wx.api.controller.form.*;
 import com.example.hospital.patient.wx.api.service.RegistrationService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,5 +54,17 @@ public class RegistrationController {
         return R.ok().put("result", registrationService.searchDoctorWorkPlanSchedule(param));
     }
 
-
+    @PostMapping("/registerMedicalAppointment")
+    @SaCheckLogin
+    public R registerMedicalAppointment(@RequestBody @Valid RegisterMedicalAppointmentForm form) {
+        int userId = StpUtil.getLoginIdAsInt();
+        Map<String, Object> param = BeanUtil.beanToMap(form);
+        param.put("userId", userId);
+        Map<String, Object> result = registrationService.registerMedicalAppointment(param);
+        if (result == null) {
+            return R.ok();
+        }
+        return R.ok(result);
+    }
 }
+

@@ -9,7 +9,6 @@ import cn.felord.payment.wechat.v3.model.Payer;
 import com.example.hospital.patient.wx.api.service.PaymentService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -32,7 +31,8 @@ public class PaymentServiceImpl implements PaymentService {
      * @param timeExpire 时间到期
      * @return {@link ObjectNode}
      */
-    public ObjectNode unifiedOrder(String outTradeNo,String openId,int total,String description , String notifyUrl , String timeExpire) {
+    @Override
+    public ObjectNode unifiedOrder(String outTradeNo, String openId, int total, String description, String notifyUrl, String timeExpire) {
         PayParams payParams = new PayParams();
         Payer payer = new Payer();
         payer.setOpenid(openId);

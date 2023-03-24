@@ -5,9 +5,14 @@ import cn.hutool.core.date.DateRange;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.example.hospital.patient.wx.api.db.dao.*;
+import com.example.hospital.patient.wx.api.db.pojo.MedicalRegistrationEntity;
 import com.example.hospital.patient.wx.api.service.FaceAuthService;
+import com.example.hospital.patient.wx.api.service.PaymentService;
 import com.example.hospital.patient.wx.api.service.RegistrationService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
@@ -17,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,12 +30,15 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@SuppressWarnings("all")
 public class RegistrationServiceImpl implements RegistrationService {
     @Resource
     private DoctorWorkPlanDao doctorWorkPlanDao;
 
     @Resource
     private MedicalRegistrationDao medicalRegistrationDao;
+
+    private final String notifyUrl = "/registration/transactionCallback";
 
     @Resource
     private UserInfoCardDao userInfoCardDao;
@@ -38,13 +47,16 @@ public class RegistrationServiceImpl implements RegistrationService {
     private FaceAuthService faceAuthService;
 
     @Resource
-    private DoctorWorkPlanScheduleDao dao;
+    private DoctorWorkPlanScheduleDao doctorWorkPlanScheduleDao;
 
     @Resource
     private UserDao userDao;
 
     @Resource
     private RedisTemplate redisTemplate;
+
+    @Resource
+    private PaymentService paymentService;
 
     @Override
     public List<Map<String, Object>> searchCanRegisterInDateRange(Map<String,Object> param) {
@@ -111,20 +123,20 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public List<Map<String, Object>> searchDoctorWorkPlanSchedule(Map<String, Object> param) {
-        return dao.searchDoctorWorkPlanSchedule(param);
+        return doctorWorkPlanScheduleDao.searchDoctorWorkPlanSchedule(param);
     }
 
     @Override
     @Transactional
     public Map<String, Object> registerMedicalAppointment(Map<String, Object> param) {
         int scheduleId = MapUtil.getInt(param, "scheduleId");
+        int workPlanId = MapUtil.getInt(param, "workPlanId");
 
         //检查Redis中是否存在日程缓存（过期的出诊计划和时段会自动删除），不存在缓存就不执行挂号
         String key = "doctor_schedule_" + scheduleId;
-        if (!redisTemplate.hasKey(key)) {
+        if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
             return null;
         }
-
         //Redis事务代码必须写到execute()回调函数中
         Object execute = redisTemplate.execute(new SessionCallback() {
             @Override
@@ -162,11 +174,76 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         //如果Redis事务提交成功，就执行下面的代码
         try {
-            //TODO 创建支付订单
-            //TODO 保存挂号记录
-            //TODO 更新数据库中的该时段挂号人数和该医生当日挂号实际人数
-            //TODO 在Redis中缓存付款记录，并设置过期时间
+            int userId = MapUtil.getInt(param, "userId");
+            //查询患者openId字符串，用于创建支付单
+            Map<String, Object> map = userDao.searchOpenId(userId);
+            String openId = MapUtil.getStr(map, "openId");
 
+            int patientCardId = MapUtil.getInt(map, "patientCardId");
+            int doctorId = MapUtil.getInt(param, "doctorId");
+            int deptSubId = MapUtil.getInt(param, "deptSubId");
+            String date = MapUtil.getStr(param, "date");
+            int slot = MapUtil.getInt(param, "slot");
+            String temp = MapUtil.getStr(param, "amount");
+            int total = NumberUtil.mul(temp, "100").intValue();
+            String outTradeNo = IdUtil.simpleUUID().toUpperCase();
+
+            //创建支付订单
+            ObjectNode objectNode = paymentService.unifiedOrder(outTradeNo, openId, total, "挂号费", notifyUrl, null);
+            //支付单的预支付ID
+            String prepayId = objectNode.get("prepay_id").textValue();
+
+            MedicalRegistrationEntity entity = new MedicalRegistrationEntity();
+            entity.setWorkPlanId(workPlanId);
+            entity.setDoctorScheduleId(scheduleId);
+            entity.setPatientCardId(patientCardId);
+            entity.setDoctorId(doctorId);
+            entity.setDeptSubId(deptSubId);
+            entity.setDate(date);
+            entity.setSlot(slot);
+            entity.setAmount(new BigDecimal(temp));
+            entity.setOutTradeNo(outTradeNo);
+            entity.setPrepayId(prepayId);
+            //保存挂号记录
+            medicalRegistrationDao.insert(entity);
+
+            //更新出诊计划实际挂号人数
+            doctorWorkPlanDao.updateNumById(new HashMap() {{
+                put("id", workPlanId);
+                put("n", 1);
+            }});
+            //更新出诊时段实际挂号人数
+            doctorWorkPlanScheduleDao.updateNumById(new HashMap() {{
+                put("id", scheduleId);
+                put("n", 1);
+            }});
+            /*
+             * 在Redis中缓存付款记录，并设置过期时间。
+             * (1) 如果15分钟内患者支付了挂号费，会有Java程序删除该缓存。
+             * (2) 如果该缓存过期，说明15分钟内患者没有支付挂号费。
+             * 如果患者没有付款，就关闭挂号单，并且恢复缓存和数据库中的已挂号人数。
+             */
+            redisTemplate.opsForHash().putAll("registration_payment_" + outTradeNo, new HashMap() {{
+                put("workPlanId", workPlanId);
+                put("scheduleId", scheduleId);
+                put("outTradeNo", outTradeNo);
+            }});
+
+            DateTime now = new DateTime();
+            now.offset(DateField.MINUTE, 15);
+            //15分钟后缓存过期
+            redisTemplate.expireAt("registration_payment_" + outTradeNo, now);
+
+            HashMap result = new HashMap() {{
+                put("outTradeNo", outTradeNo);
+                put("prepayId", prepayId);
+                put("timeStamp", objectNode.get("timeStamp").asText());
+                put("nonceStr", objectNode.get("nonceStr").asText());
+                put("package", objectNode.get("package").asText());
+                put("signType", objectNode.get("signType").asText());
+                put("paySign", objectNode.get("paySign").asText());
+            }};
+            return result;
         } catch (Exception e) {
             if (redisTemplate.hasKey(key)) {
                 //恢复缓存该日程已经挂号数量
@@ -174,6 +251,5 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
             throw e;
         }
-        return param;
     }
 }

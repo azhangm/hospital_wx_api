@@ -10,6 +10,7 @@ public interface DoctorWorkPlanScheduleDao {
 
      int updateNumById(Map<String,Object> param);
 
+     int releaseNumByOutTradeNo(String outTradeNo);
 }
 
 

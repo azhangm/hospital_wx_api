@@ -25,5 +25,12 @@
         WHERE "id" = ${id}
     </update>
 
+    <update id="releaseNumByOutTradeNo" parameterType="String">
+        UPSERT INTO HOSPITAL.DOCTOR_WORK_PLAN_SCHEDULE("id","num")
+        SELECT s."id", s."num" - 1 AS "num"
+        FROM HOSPITAL.MEDICAL_REGISTRATION r
+                 JOIN HOSPITAL.DOCTOR_WORK_PLAN_SCHEDULE s ON r."doctor_schedule_id" = s."id"
+        WHERE r."out_trade_no" = #{outTradeNo}
+    </update>
 
 </mapper>

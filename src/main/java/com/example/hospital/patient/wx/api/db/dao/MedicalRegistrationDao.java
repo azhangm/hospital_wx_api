@@ -12,6 +12,10 @@ public interface MedicalRegistrationDao {
      Integer hasRegisterRecordInDay(Map<String,Object> param);
 
      int insert(MedicalRegistrationEntity entity);
+
+    int discardPayment(String outTradeNo);
+
+    Map<String,Object> searchWorkPlanIdAndScheduleId(String outTradeNo);
 }
 
 

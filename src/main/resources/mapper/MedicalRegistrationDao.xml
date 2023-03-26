@@ -36,5 +36,20 @@
         )
     </insert>
 
+    <update id="discardPayment" parameterType="String">
+        UPSERT INTO HOSPITAL.MEDICAL_REGISTRATION("id","payment_status")
+        SELECT "id", 4
+        FROM HOSPITAL.MEDICAL_REGISTRATION
+        WHERE "out_trade_no" = #{outTradeNo}
+          AND "payment_status" = 1
+    </update>
+
+    <select id="searchWorkPlanIdAndScheduleId" parameterType="String" resultType="java.util.Map">
+        SELECT "doctor_schedule_id" AS "doctorScheduleId",
+               "work_plan_id"       AS "workPlanId"
+        FROM HOSPITAL.MEDICAL_REGISTRATION
+        WHERE "out_trade_no" = #{outTradeNo}
+    </select>
+
 
 </mapper>

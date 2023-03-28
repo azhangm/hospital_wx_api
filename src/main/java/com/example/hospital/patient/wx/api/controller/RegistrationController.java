@@ -2,25 +2,32 @@ package com.example.hospital.patient.wx.api.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.felord.payment.wechat.v3.WechatApiProvider;
+import cn.felord.payment.wechat.v3.model.ResponseSignVerifyParams;
 import cn.hutool.core.bean.BeanUtil;
 import com.example.hospital.patient.wx.api.common.R;
 import com.example.hospital.patient.wx.api.controller.form.*;
 import com.example.hospital.patient.wx.api.service.RegistrationService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.SneakyThrows;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.net.http.HttpClient;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/registration")
 public class RegistrationController {
     @Resource
     private RegistrationService registrationService;
+
+    @Resource
+    private WechatApiProvider wechatApiProvider;
 
     @PostMapping("/searchCanRegisterInDateRange")
     @SaCheckLogin
@@ -65,6 +72,39 @@ public class RegistrationController {
             return R.ok();
         }
         return R.ok(result);
+    }
+
+    @SneakyThrows
+    @PostMapping("/transaction-callback")
+    public Map<String,String> transactionCallback(
+            @RequestHeader("Wechatpay-Serial") String serial,
+            @RequestHeader("Wechatpay-Signature") String signature,
+            @RequestHeader("Wechatpay-Timestamp") String timestamp,
+            @RequestHeader("Wechatpay-Nonce") String nonce,
+            HttpServletRequest request) {
+
+        String body = request.getReader().lines().collect(Collectors.joining());
+
+        //创建封装对象，添加相关参数，验证请求真伪需要用到
+        ResponseSignVerifyParams params = new ResponseSignVerifyParams();
+        params.setWechatpaySerial(serial);
+        params.setWechatpaySignature(signature);
+        params.setWechatpayTimestamp(timestamp);
+        params.setWechatpayNonce(nonce);
+        params.setBody(body);
+
+        //验证通知消息的真伪
+        return wechatApiProvider.callback("patient-wx-api").transactionCallback(params, data -> {
+            String outTradeNo = data.getOutTradeNo();
+            String transactionId = data.getTransactionId();
+            //更新挂号记录的付款状态和付款单ID
+            registrationService.updatePayment(new HashMap<>() {{
+                put("outTradeNo", outTradeNo);
+                put("transactionId", transactionId);
+                put("paymentStatus", 2);
+            }});
+
+        });
     }
 }
 

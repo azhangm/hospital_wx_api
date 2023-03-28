@@ -51,5 +51,11 @@
         WHERE "out_trade_no" = #{outTradeNo}
     </select>
 
+    <update id="updatePayment" parameterType="Map">
+        UPSERT INTO HOSPITAL.MEDICAL_REGISTRATION("id","transaction_id","payment_status")
+        SELECT "id", #{transactionId}, ${paymentStatus}
+        FROM HOSPITAL.MEDICAL_REGISTRATION
+        WHERE "out_trade_no" = #{outTradeNo}
+    </update>
 
 </mapper>

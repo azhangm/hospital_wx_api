@@ -16,6 +16,8 @@ public interface MedicalRegistrationDao {
     int discardPayment(String outTradeNo);
 
     Map<String,Object> searchWorkPlanIdAndScheduleId(String outTradeNo);
+
+    public int updatePayment(Map<String,Object> param);
 }
 
 

@@ -252,4 +252,14 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw e;
         }
     }
+
+    @Override
+    @Transactional
+    public void updatePayment(Map<String,Object> param) {
+        String outTradeNo = MapUtil.getStr(param, "outTradeNo");
+        //既然患者支付了挂号费，我们就该删除Redis中对应的挂号缓存
+        redisTemplate.delete("registration_payment_" + outTradeNo);
+        //更新挂号单付款为已付款状态（2状态）
+        medicalRegistrationDao.updatePayment(param);
+    }
 }
